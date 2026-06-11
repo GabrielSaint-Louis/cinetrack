@@ -1,5 +1,12 @@
+<input
+  type="search"
+  placeholder="Rechercher un titre ou un artiste…"
+  [value]="query()"
+  (input)="query.set($any($event.target).value)"
+/>
+
 <section class="grid">
-  @for (track of tracks(); track track.id) {
+  @for (track of filteredTracks(); track track.id) {
     <app-track-card
       [track]="track"
       [active]="track.id === selectedId()"
