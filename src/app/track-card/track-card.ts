@@ -20,9 +20,7 @@ export class TrackCard {
     this.select.emit(this.track());
   }
 
-  protected toggleFavorite(event: Event): void {
-    // Keep the favorite action from triggering the card's "open detail" click.
-    event.stopPropagation();
+  protected toggleFavorite(): void {
     this.favoriteToggled.emit(this.track());
   }
 }
