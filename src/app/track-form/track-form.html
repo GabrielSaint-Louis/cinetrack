@@ -1,5 +1,9 @@
 <form novalidate (submit)="onSubmit($event)">
-  <h2>Ajouter un morceau</h2>
+  <h2>{{ title() }}</h2>
+
+  @if (loadFailed()) {
+    <p class="error" role="alert">Impossible de charger ce morceau.</p>
+  }
 
   <label>
     Titre
@@ -22,5 +26,11 @@
     <input type="number" [formField]="trackForm.rating" />
   </label>
 
-  <button type="submit" [disabled]="!trackForm().valid()">Ajouter</button>
+  @if (saveFailed()) {
+    <p class="error" role="alert">Impossible d'enregistrer ce morceau.</p>
+  }
+
+  <button type="submit" [disabled]="!trackForm().valid() || isSaving()">
+    {{ isSaving() ? 'Enregistrement…' : 'Enregistrer' }}
+  </button>
 </form>

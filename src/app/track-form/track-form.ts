@@ -1,6 +1,9 @@
-import { Component, output, signal } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, input, numberAttribute, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { form, FormField, required, min, max } from '@angular/forms/signals';
-import { Track } from '../models/track';
+import { catchError, of, switchMap } from 'rxjs';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { TrackPayload, TrackService } from '../services/track.service';
 
 const currentYear = new Date().getFullYear();
 
@@ -11,9 +14,38 @@ const currentYear = new Date().getFullYear();
   styleUrl: './track-form.css',
 })
 export class TrackForm {
-  created = output<Track>();
+  id = input<number | undefined, unknown>(undefined, {
+    transform: (value) => (value === undefined || value === null ? undefined : numberAttribute(value)),
+  });
+
+  private destroyRef = inject(DestroyRef);
+  private router = inject(Router);
+  private trackService = inject(TrackService);
 
   protected model = signal({ title: '', artist: '', rating: 5 });
+  protected isSaving = signal(false);
+  protected saveFailed = signal(false);
+  protected loadFailed = signal(false);
+  protected isEditMode = computed(() => this.id() !== undefined && !Number.isNaN(this.id()));
+  protected title = computed(() => (this.isEditMode() ? 'Modifier le morceau' : 'Ajouter un morceau'));
+
+  private trackToEdit = toSignal(
+    toObservable(this.id).pipe(
+      switchMap((id) => {
+        if (id === undefined || Number.isNaN(id)) {
+          return of(null);
+        }
+
+        return this.trackService.getTrack(id).pipe(
+          catchError(() => {
+            this.loadFailed.set(true);
+            return of(null);
+          }),
+        );
+      }),
+    ),
+    { initialValue: null },
+  );
 
   protected trackForm = form(this.model, (path) => {
     required(path.title, { message: 'Le titre est requis' });
@@ -22,13 +54,53 @@ export class TrackForm {
     max(path.rating, 10);
   });
 
+  constructor() {
+    effect(() => {
+      const track = this.trackToEdit();
+
+      if (!track) {
+        return;
+      }
+
+      this.loadFailed.set(false);
+      this.model.set({
+        title: track.title,
+        artist: track.artist,
+        rating: track.rating,
+      });
+    });
+  }
+
   protected onSubmit(event: Event): void {
     event.preventDefault();
     if (!this.trackForm().valid()) return;
 
+    this.saveFailed.set(false);
+    this.isSaving.set(true);
+
+    const id = this.id();
+    const request =
+      id === undefined || Number.isNaN(id)
+        ? this.trackService.create(this.createPayload())
+        : this.trackService.update(id, this.model());
+
+    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.model.set({ title: '', artist: '', rating: 5 });
+        this.router.navigate(['/tracks']);
+      },
+      error: () => {
+        this.isSaving.set(false);
+        this.saveFailed.set(true);
+      },
+    });
+  }
+
+  private createPayload(): TrackPayload {
     const { title, artist, rating } = this.model();
-    this.created.emit({
-      id: Date.now(),
+
+    return {
       title,
       artist,
       album: '',
@@ -38,8 +110,6 @@ export class TrackForm {
       rating,
       favorite: false,
       coverUrl: `https://picsum.photos/seed/cinetrack-${Date.now()}/300`,
-    });
-
-    this.model.set({ title: '', artist: '', rating: 5 });
+    };
   }
 }
