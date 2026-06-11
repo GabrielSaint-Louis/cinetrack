@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from './services/auth.service';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -10,4 +11,5 @@ import { AuthService } from './services/auth.service';
 })
 export class App {
   protected auth = inject(AuthService);
+  protected favoritesEnabled = environment.features.favorites;
 }

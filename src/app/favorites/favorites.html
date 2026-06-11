@@ -1,0 +1,12 @@
+<h2>Mes favoris</h2>
+
+@if (tracks().length === 0) {
+  <p>Aucun favori pour le moment.</p>
+} @else {
+  <app-track-list
+    [tracks]="tracks()"
+    [favoriteEnabled]="favoritesEnabled"
+    (trackSelected)="openTrack($event)"
+    (favoriteToggled)="onFavoriteToggle($event)"
+  />
+}

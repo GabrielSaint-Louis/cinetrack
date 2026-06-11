@@ -1,11 +1,17 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
+import { favoritesFeatureGuard } from './guards/favorites-feature.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'tracks', pathMatch: 'full' },
   {
     path: 'tracks',
     loadComponent: () => import('./track-search/track-search').then((m) => m.TrackSearch),
+  },
+  {
+    path: 'favorites',
+    canActivate: [favoritesFeatureGuard, authGuard],
+    loadComponent: () => import('./favorites/favorites').then((m) => m.Favorites),
   },
   {
     path: 'tracks/new',
