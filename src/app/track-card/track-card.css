@@ -7,11 +7,17 @@
   cursor: pointer;
   transition:
     border-color 120ms ease,
-    box-shadow 120ms ease;
+    box-shadow 120ms ease,
+    transform 120ms ease;
 }
 
 .card:hover {
   border-color: #6b7280;
+}
+
+.card:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 3px;
 }
 
 .card.active {
@@ -44,4 +50,19 @@
   background: #dbeafe;
   font-size: 0.875rem;
   font-weight: 700;
+}
+
+.badge.gold {
+  color: #78350f;
+  background: #fde68a;
+}
+
+.badge.muted {
+  color: #374151;
+  background: #e5e7eb;
+}
+
+.duration {
+  color: #6b7280;
+  font-variant-numeric: tabular-nums;
 }
