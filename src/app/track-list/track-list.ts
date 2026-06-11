@@ -1,4 +1,4 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, input, signal, output } from '@angular/core';
 import { TrackCard } from '../track-card/track-card';
 import { Track } from '../models/track';
 
@@ -11,25 +11,10 @@ import { Track } from '../models/track';
 export class TrackList {
   tracks = input.required<Track[]>();
   trackSelected = output<number>();
-  protected selectedId = signal<number | null>(null);
-  protected query = signal('');
-
-  protected filteredTracks = computed(() => {
-    const query = this.query().trim().toLowerCase();
-
-    if (!query) {
-      return this.tracks();
-    }
-
-    return this.tracks().filter(
-      (track) =>
-        track.title.toLowerCase().includes(query) ||
-        track.artist.toLowerCase().includes(query),
-    );
-  });
+  protected selection = signal<number | null>(null);
 
   protected selectTrack(track: Track): void {
-    this.selectedId.set(track.id);
+    this.selection.set(track.id);
     this.trackSelected.emit(track.id);
   }
 }
