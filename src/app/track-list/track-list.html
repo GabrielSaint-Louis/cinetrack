@@ -1,0 +1,7 @@
+<section class="grid">
+  @for (track of tracks(); track track.id) {
+    <app-track-card [track]="track" />
+  } @empty {
+    <p>Aucun morceau à afficher.</p>
+  }
+</section>
