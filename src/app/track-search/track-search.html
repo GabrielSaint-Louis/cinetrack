@@ -8,6 +8,10 @@
   />
 </label>
 
+@if (favoriteError()) {
+  <p class="error" role="alert">Impossible de mettre à jour les favoris. Réessayez.</p>
+}
+
 <app-track-list
   [tracks]="tracks()"
   [favoriteEnabled]="favoritesEnabled"

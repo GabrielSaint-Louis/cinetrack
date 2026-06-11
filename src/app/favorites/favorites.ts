@@ -17,6 +17,7 @@ export class Favorites {
   private destroyRef = inject(DestroyRef);
   private router = inject(Router);
   protected favoritesEnabled = environment.features.favorites;
+  protected favoriteError = signal(false);
 
   private loaded = toSignal(this.favoritesService.getFavorites(), {
     initialValue: [] as Track[],
@@ -33,12 +34,15 @@ export class Favorites {
 
   protected onFavoriteToggle(track: Track): void {
     // Every track on this page is a favorite, so toggling means removing it.
+    this.favoriteError.set(false);
+
     this.favoritesService
       .remove(track.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () =>
           this.tracks.update((tracks) => tracks.filter((current) => current.id !== track.id)),
+        error: () => this.favoriteError.set(true),
       });
   }
 }

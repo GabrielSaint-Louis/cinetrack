@@ -21,6 +21,7 @@ export class TrackSearch {
   private router = inject(Router);
   protected term = signal('');
   protected favoritesEnabled = environment.features.favorites;
+  protected favoriteError = signal(false);
 
   protected openTrack(id: number): void {
     this.router.navigate(['/tracks', id]);
@@ -51,12 +52,16 @@ export class TrackSearch {
   }
 
   protected onFavoriteToggle(track: Track): void {
+    this.favoriteError.set(false);
+
     const request = track.favorite
       ? this.favorites.remove(track.id)
       : this.favorites.add(track.id);
 
     request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => this.setFavorite(track.id, !track.favorite),
+      // Only reflect the change on success; otherwise surface the failure.
+      error: () => this.favoriteError.set(true),
     });
   }
 

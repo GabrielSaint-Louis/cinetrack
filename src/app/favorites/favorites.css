@@ -1,3 +1,9 @@
 h2 {
   margin-block: 1rem 0.5rem;
 }
+
+.error {
+  margin-block: 0.5rem;
+  color: #b91c1c;
+  font-weight: 700;
+}

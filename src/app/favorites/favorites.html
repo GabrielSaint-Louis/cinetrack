@@ -1,5 +1,9 @@
 <h2>Mes favoris</h2>
 
+@if (favoriteError()) {
+  <p class="error" role="alert">Impossible de mettre à jour les favoris. Réessayez.</p>
+}
+
 @if (tracks().length === 0) {
   <p>Aucun favori pour le moment.</p>
 } @else {
