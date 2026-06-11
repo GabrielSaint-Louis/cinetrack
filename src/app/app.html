@@ -1,4 +1,14 @@
 <h1>CinéTrack 🎵</h1>
+
+@if (auth.isLoggedIn()) {
+  <p class="session">
+    <span>Connecté{{ auth.user()?.name ? ' · ' + auth.user()?.name : '' }}</span>
+    <button type="button" (click)="auth.logout()">Se déconnecter</button>
+  </p>
+} @else {
+  <app-auth-login />
+}
+
 <app-track-search (trackSelected)="showTrack($event)" />
 
 @if (selectedId(); as id) {
