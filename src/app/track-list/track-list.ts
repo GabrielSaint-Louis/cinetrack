@@ -1,4 +1,4 @@
-import { Component, computed, input, signal } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { TrackCard } from '../track-card/track-card';
 import { Track } from '../models/track';
 
@@ -10,6 +10,7 @@ import { Track } from '../models/track';
 })
 export class TrackList {
   tracks = input.required<Track[]>();
+  trackSelected = output<number>();
   protected selectedId = signal<number | null>(null);
   protected query = signal('');
 
@@ -29,5 +30,6 @@ export class TrackList {
 
   protected selectTrack(track: Track): void {
     this.selectedId.set(track.id);
+    this.trackSelected.emit(track.id);
   }
 }
