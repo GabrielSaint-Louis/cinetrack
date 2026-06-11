@@ -1,4 +1,5 @@
-import { Component, inject, output, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, debounceTime, distinctUntilChanged, of, switchMap } from 'rxjs';
 import { Track } from '../models/track';
@@ -13,8 +14,12 @@ import { TrackList } from '../track-list/track-list';
 })
 export class TrackSearch {
   private service = inject(TrackService);
+  private router = inject(Router);
   protected term = signal('');
-  trackSelected = output<number>();
+
+  protected openTrack(id: number): void {
+    this.router.navigate(['/tracks', id]);
+  }
 
   protected results = toSignal(
     toObservable(this.term).pipe(
