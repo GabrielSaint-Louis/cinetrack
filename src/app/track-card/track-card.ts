@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { Track } from '../models/track';
 
 @Component({
@@ -8,4 +8,10 @@ import { Track } from '../models/track';
 })
 export class TrackCard {
   track = input.required<Track>();
+  active = input(false);
+  select = output<Track>();
+
+  protected selectTrack(): void {
+    this.select.emit(this.track());
+  }
 }
