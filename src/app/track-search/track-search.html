@@ -8,4 +8,9 @@
   />
 </label>
 
-<app-track-list [tracks]="results()" (trackSelected)="openTrack($event)" />
+<app-track-list
+  [tracks]="tracks()"
+  [favoriteEnabled]="favoritesEnabled"
+  (trackSelected)="openTrack($event)"
+  (favoriteToggled)="onFavoriteToggle($event)"
+/>

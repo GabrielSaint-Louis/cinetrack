@@ -3,7 +3,9 @@
   <app-track-card
     [track]="track"
     [active]="track.id === selection()"
+    [favoriteEnabled]="favoriteEnabled()"
     (select)="selectTrack($event)"
+    (favoriteToggled)="favoriteToggled.emit($event)"
   />
   } @empty {
   <p>Aucun morceau.</p>

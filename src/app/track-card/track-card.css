@@ -66,3 +66,27 @@
   color: #6b7280;
   font-variant-numeric: tabular-nums;
 }
+
+.favorite {
+  width: fit-content;
+  padding: 0.3rem 0.6rem;
+  color: #374151;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 2px solid #cbd5e1;
+  border-radius: 999px;
+  background: #fff;
+}
+
+.favorite.is-favorite {
+  color: #78350f;
+  border-color: #fbbf24;
+  background: #fef3c7;
+}
+
+.favorite:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+}

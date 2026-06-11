@@ -10,7 +10,9 @@ import { Track } from '../models/track';
 })
 export class TrackList {
   tracks = input.required<Track[]>();
+  favoriteEnabled = input(false);
   trackSelected = output<number>();
+  favoriteToggled = output<Track>();
   protected selection = signal<number | null>(null);
 
   protected selectTrack(track: Track): void {

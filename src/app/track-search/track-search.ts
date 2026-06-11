@@ -1,10 +1,12 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, debounceTime, distinctUntilChanged, of, switchMap } from 'rxjs';
 import { Track } from '../models/track';
 import { TrackService } from '../services/track.service';
+import { FavoritesService } from '../services/favorites.service';
 import { TrackList } from '../track-list/track-list';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-track-search',
@@ -14,14 +16,17 @@ import { TrackList } from '../track-list/track-list';
 })
 export class TrackSearch {
   private service = inject(TrackService);
+  private favorites = inject(FavoritesService);
+  private destroyRef = inject(DestroyRef);
   private router = inject(Router);
   protected term = signal('');
+  protected favoritesEnabled = environment.features.favorites;
 
   protected openTrack(id: number): void {
     this.router.navigate(['/tracks', id]);
   }
 
-  protected results = toSignal(
+  private searchResults = toSignal(
     toObservable(this.term).pipe(
       debounceTime(300),
       distinctUntilChanged(),
@@ -36,4 +41,28 @@ export class TrackSearch {
     ),
     { initialValue: [] as Track[] },
   );
+
+  // Mirror the search stream into a writable signal so a favorite toggle can
+  // patch a single card without re-querying the server.
+  protected tracks = signal<Track[]>([]);
+
+  constructor() {
+    effect(() => this.tracks.set(this.searchResults()));
+  }
+
+  protected onFavoriteToggle(track: Track): void {
+    const request = track.favorite
+      ? this.favorites.remove(track.id)
+      : this.favorites.add(track.id);
+
+    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => this.setFavorite(track.id, !track.favorite),
+    });
+  }
+
+  private setFavorite(id: number, favorite: boolean): void {
+    this.tracks.update((tracks) =>
+      tracks.map((track) => (track.id === id ? { ...track, favorite } : track)),
+    );
+  }
 }
